@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <meta name="twitter:widgets:csp" content="on" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <script
+      type="text/javascript"
+      src="%PUBLIC_URL%/Services/FBServices.js"
+    ></script>
+    <title>React App</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+
+  <!-- Twitter widgets -->
+  <script
+    async
+    defer
+    src="//platform.twitter.com/widgets.js"
+    charset="utf-8"
+  ></script>
+  
+  <!-- Telegram API   -->
+  <script
+    type="text/javascript"
+  >var previousNumber = null;
+  var Telegram = true;
+  //When user Submit all details
+  document.getElementById("formPart").addEventListener("submit", validateUser);
+  
+  document.getElementById("phoneVerify").addEventListener("click", async (e) => {
+    e.preventDefault();
+  
+    if (await validatePhone()) {
+      console.log("Sorry you have already account");
+      document.getElementById("JoinBTN").style.display = "none";
+      document.getElementById("accountExist").style.display = "block";
+    } else {
+      document.getElementById("accountExist").style.display = "none";
+      document.getElementById("phoneContainer").style.display = "none";
+      document.getElementById("JoinBTN").style.display = "inline-block";
+      document.getElementById("formPart").style.display = "block";
+      document.getElementById("wrongNumber").style.display = "block";
+    }
+  });
+  
+  // When user enter Wrong number
+  document.getElementById("wrongNumber").addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("wrongNumber").style.display = "none";
+    document.getElementById("JoinBTN").style.display = "none";
+    document.getElementById("accountExist").style.display = "none";
+    document.getElementById("phoneContainer").style.display = "block";
+    document.getElementById("formPart").style.display = "none";
+  });
+  
+  // Function is validate  phoneNumber is already registered or not registered
+  async function validatePhone() {
+    //Get the Value from phoneNumber input field
+    previousNumber = document.getElementById("phoneNumber").value;
+    document.getElementById("FphoneNumber").innerHTML = previousNumber;
+    console.log(previousNumber);
+  
+    //Fecth Data from API
+    let data = await fetch("http://localhost:5000/user/phone/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        Phone: document.getElementById("phoneNumber").value,
+      }),
+    });
+  
+    //Save json data in variable
+    data = await data.json();
+    return data.msg;
+  }
+  
+  // Function is validate the User detail. Check Details  correct or not
+  async function validateUser(e) {
+    e.preventDefault();
+  
+    //Fetch Data from API
+    let data = await fetch("http://localhost:5000/users/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        Phone: document.getElementById("FphoneNumber").value,
+        TUserName: document.getElementById("FTusername").value,
+      }),
+    });
+  
+    //Save json data in variable
+    data = await data.json();
+    // userValidate = data.msg;
+    console.log(data.msg);
+    if(data.msg){
+      alert("You have successfully Join telegram ");
+    }else{
+      alert( "Please Enter Valid Creadentials ")
+    }
+   
+  }
+  </script>
+
+<!-- Twitter widget  -->
+  <script type="text/javascript">
+    //Follow event of Twitter Button
+    window.twttr = (function (d, s, id) {
+      var js,
+        fjs = d.getElementsByTagName(s)[0],
+        t = window.twttr || {};
+      if (d.getElementById(id)) return t;
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://platform.twitter.com/widgets.js";
+      fjs.parentNode.insertBefore(js, fjs);
+
+      t._e = [];
+      t.ready = function (f) {
+        t._e.push(f);
+      };
+      return t;
+    })(document, "script", "twitter-wjs");
+  </script>
+
+<script type="text/javascript">
+  var TwitterFollow = true;
+
+document.getElementById("TwButton").addEventListener("click", async (e) => {
+  e.preventDefault();
+  console.log("Twitter: " + document.getElementById("TwUsername").value);
+  let data = await fetch("http://localhost:5000/Tfollow/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      USER: document.getElementById("TwUsername").value,
+    }),
+  });
+
+  data = await data.json();
+
+  if (data.msg == true) {
+    alert("You have successfully followed");
+    TwitterFollow = true;
+  } else {
+    alert("Please enter correct username or Follow");
+  }
+});
+
+twttr.ready((twttr) => {
+  twttr.events.bind("follow", function (event) {
+    console.log(event);
+    alert("You have successfully Follwed");
+    var followed_user_id = event.data.user_id;
+    var followed_screen_name = event.data.screen_name;
+  });
+
+  twttr.events.bind("tweet", function (ev) {
+    console.log(ev);
+    alert("Tweet");
+  });
+});
+
+</script>
+
+
+  </script>
+</html>
